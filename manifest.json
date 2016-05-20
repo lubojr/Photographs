@@ -1,0 +1,16 @@
+{
+  "name": "Photographs",
+  "label": "Fotografie",
+  "platform": "HTML",
+  "version": "1.4",
+  "wabVersion": "1.4",
+  "author": "Lubomir Bucek",
+  "description": "Widget used for displaying photographs the same way as story maps shortlist",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {
+  "inPanel": true,
+  "hasLocale":true
+     
+  }
+}
