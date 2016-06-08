@@ -72,6 +72,7 @@ DETAILS_PANEL = true;
 ORDERING = true;
 ORDER_ENTRIES_BY = FIELDNAME_TITLE;
 ASCENDING = true;
+IMGSOURCE = ["http://pokusslatinany.jecool.net/resources/images/icons"];
 TAB_ORDER = []; 
 TAB_NAMES = []; 
 POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS = "";
@@ -409,6 +410,7 @@ function buildLayers(layer, featServLayerIndex){
 			}
 		}
 
+
 		var featServRequests = 0;
 		if(_featureService){
 
@@ -603,7 +605,7 @@ function initMap(layers) {
 	var graphicTitle;
 
 	$.each(layers, function(index,value){
-		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url) //pokud má feature layer rozmezí měřítek, nezobraz ji
+		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url) //pokud feature layer není viditelná v současném měřítku, nezobrazovat
 			return;
 		if(value.id === 'labels'){
 			setTimeout(function(){
@@ -733,9 +735,11 @@ function initMap(layers) {
 		}else{
 			features = getFeatureSet(value).features;
 		}
-
 		$.each(features, function(index,value) {
-			value.attributes.getValueCI = getValueCI; 
+			value.attributes.getValueCI = getValueCI; });
+		features=features.mergeSort(SortBySomething);
+		
+		$.each(features, function(index,value) {
 			value.attributes[FIELDNAME_ID] = index + 1; // assign internal shortlist id which is then used if fieldname NUMBER is not present
 			if(index === 0){
 				if(!value.attributes[FIELDNAME_NUMBER] && !value.attributes.NUMBER && !value.attributes.number)
@@ -755,8 +759,9 @@ function initMap(layers) {
 		colorScheme = $.grep(COLOR_SCHEMES, function(n,i){
 			return n.name.toLowerCase() == $.trim(colorOrder[colorIndex].toLowerCase());
 		})[0];
+		
 		contentLayer = buildLayer(
-					features.sort(SortBySomething),
+					features,
 					colorScheme.iconDir,
 					colorScheme.iconPrefix
 					);
@@ -795,10 +800,9 @@ function initMap(layers) {
 	_ExtentChangeSignal = on(_map, 'extent-change', function(){
 		refreshList();
 		});
-	topic.subscribe('/dnd/move/stop', lang.hitch(this, function(){  
+	_WidgetMoveSignal = topic.subscribe('/dnd/move/stop', lang.hitch(this, function(){  
   		refreshList(); 
 		})); 
-	on(_map.infoWindow,"hide",infoWindow_onHide); 
 	
 }
 
@@ -846,9 +850,6 @@ function layer_onMouseOut(event)
 	Tooltip.hide(_node);
 }
 
-function infoWindow_onHide(event) { //infowindow hide event
-	unselect();
-}	
 
 function getFeatureSet(layer)
 {
@@ -1000,8 +1001,8 @@ function buildLayer(arr,iconDir,root) {
 	var pt;
 	var sym;
 	$.each(arr,function(index,value){
-		pt = new Point(value.geometry.x,value.geometry.y,value.geometry.spatialReference);    //needs another directory, for example on your server!!! 
-		sym = createPictureMarkerSymbol("http://pokusslatinany.jecool.net/resources/images/icons/"+iconDir+"/"+root+value.attributes.getValueCI(FIELDNAME_NUMBER)+".png");
+		pt = new Point(value.geometry.x,value.geometry.y,value.geometry.spatialReference);    
+		sym = createPictureMarkerSymbol(IMGSOURCE+"/"+iconDir+"/"+root+value.attributes.getValueCI(FIELDNAME_NUMBER)+".png");
 		layer.add(new Graphic(pt,sym,value.attributes));
 	});
 	return layer;
@@ -1040,10 +1041,14 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
 			});
 			});		
 		$(".jimu-widget-Photographs #tabs").empty();		//clears the tabs		 
-      _map.infoWindow.hide();								//hides infowindow if one is open
+      _map.infoWindow.hide();	//hides infowindow if one is open
+      							
+      _ExtentChangeSignal.remove();
+      _WidgetMoveSignal.remove();
      if (ORDERING){
       MYmenu.destroy();
       MYbutton.destroy();
+      
      }
     },
 
