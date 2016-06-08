@@ -4,7 +4,7 @@ define(['dojo/_base/declare',
  'esri/layers/graphics',
  'esri/layers/FeatureLayer',
  'esri/layers/GraphicsLayer',
-
+ 'esri/map',
 // 'jimu/loaderplugins/jquery-loader!//code.jquery.com/jquery-1.11.2.min.js',
  
  // WARNING!! Mandatory to put this line: 'code.jquery.com/jquery-1.11.2.min.js' into resource array in init.js in stemapp folder and then upload it to server!!
@@ -15,7 +15,6 @@ define(['dojo/_base/declare',
  'dojo/DeferredList',						
  'esri/symbols/PictureMarkerSymbol',
  'esri/graphic',
- './OtherFunctions',
  'dojo/topic',
  'dojo/_base/lang',
  'dijit/Menu',
@@ -25,9 +24,11 @@ define(['dojo/_base/declare',
  'dojo/dom', 
  'dijit/Tooltip',
  './colorbox',
+ './OtherFunctions',
+ './idangerousswiper',
  ],
-function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, on, 
-	DeferredList,PictureMarkerSymbol,Graphic, _ActivateLayer, topic, lang, 
+function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,on, 
+	DeferredList,PictureMarkerSymbol,Graphic, topic, lang, 
 	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, Tooltip) {
   return declare([BaseWidget], {
 	name: 'Photographs',
@@ -53,19 +54,27 @@ function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, on,
 /////////////////CAN BE EDITED START///////////////
     /////////////////////////////////////////
  
-FIELDNAME_NUMBER = ["Number"];
-FIELDNAME_TITLE = ["nazev"];
-FIELDNAME_SHORTDESC = ["popis"];
-FIELDNAME_IMAGEURL = ["url_foto"];
+FIELDNAME_NUMBER = ["Number2"];//když nechám number, tak se zezačátku čísla řadí podle number a ne podle jména, woe
+//FIELDNAME_TITLE = ["nazev"];
+FIELDNAME_TITLE = ["Title"];
+//FIELDNAME_SHORTDESC = ["popis"];
+FIELDNAME_SHORTDESC = ["Short_desc"];
+//FIELDNAME_IMAGEURL = ["url_foto"];
+FIELDNAME_IMAGEURL = ["Image_URL"];
 FIELDNAME_ADDRESS = ["Address"];
 FIELDNAME_WEBSITE = ["url_foto"];
-FIELDNAME_DESC1 = ["popis"];
-FIELDNAME_DESC2 = ["datace"];
-FIELDNAME_DESC3 = ["zdroj"];
+//FIELDNAME_DESC1 = ["popis"];
+FIELDNAME_DESC1 = ["Desc1"];
+//FIELDNAME_DESC2 = ["datace"];
+FIELDNAME_DESC2 = ["Desc2"];
+//FIELDNAME_DESC3 = ["zdroj"];
+FIELDNAME_DESC3 = ["Desc3"];
 FIELDNAME_DESC4 = ["Desc4"];
 FIELDNAME_DESC5 = ["Desc5"];
-FIELDNAME_YEAR =["datace"]; 	//IS USED FOR ORDERING BY YEAR, NOT SHOWN IN PANELS - SHOULD BE A NUMBER ONLY
-FIELDNAME_SOURCE =["zdroj"]; 	//IS USED FOR ORDERING BY SOURCE, NOT SHOWN IN PANELS
+//FIELDNAME_YEAR =["datace"]; 	//IS USED FOR ORDERING BY YEAR, NOT SHOWN IN PANELS - SHOULD BE A NUMBER ONLY
+FIELDNAME_YEAR =["Desc1"]; 
+//FIELDNAME_SOURCE =["zdroj"]; 	//IS USED FOR ORDERING BY SOURCE, NOT SHOWN IN PANELS
+FIELDNAME_SOURCE =["Desc2"]; 	
 FIELDNAME_TAB = ["Tab_Name"];
 FIELDNAME_ID = ["Shortlist_ID"];  
 DETAILS_PANEL = true;  
@@ -77,7 +86,8 @@ TAB_ORDER = [];
 TAB_NAMES = []; 
 POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS = "";
 COLOR_ORDER = "green,red,blue,purple,black";
-
+SUPPORTING_LAYERS_THAT_ARE_CLICKABLE = "Trails|Tramway|Neighborhoods|Convention Center";
+			// If there's more than one layer, use the "|" character as delimiter
 			// If the tabs are defined using a single layer, you can optionally use parameters TAB_NAMES,TAB_ORDER 
 			// to override the tab order and names defined in that layer without editing the layer.
 			// If you specify TAB_NAMES: a) all tabs must be included in TAB_NAMES, whether or not
@@ -115,7 +125,13 @@ _selected =null;
 _featureService = false;
 _pointsInOneLayer = null;
 _map = this.map;
+_isMobile = isMobile();
 _panel=[];
+_iterator = [0];
+_SupportLayerSignalMouseOver=[];
+_SupportLayerSignalMouseOut=[];
+_SupportLayerSignalClick=[];
+
 
 //////////////////ordering //////////////////
 if (ORDERING){
@@ -269,7 +285,7 @@ if (FIELDNAME_YEAR.length>0){
 		_panel=".dart-panel";
 }
 Array.prototype.mergeSort = mergeSort;
-		
+_map.setInfoWindowOnClick(false);
 		var layers = [];
 		$.each(_map.graphicsLayerIds, function(i, id){
 			layers.push(_map.getLayer(id));
@@ -596,11 +612,16 @@ function organizeLayers(results) {
 
 function initMap(layers) {
 	pointLayers = [];
+	supportLayers = [];
+	temporarySupportLayers = [];
 	var arrExemptions = [];
 	$.each(POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS.split("|"), function(index, value) {
 		arrExemptions.push($.trim(value).toLowerCase());
 	});
-
+	var supportingLayersThatAreClickable = [];
+	$.each(SUPPORTING_LAYERS_THAT_ARE_CLICKABLE.split("|"), function(index, value) {
+		supportingLayersThatAreClickable.push($.trim(value).toLowerCase());
+	});
 
 	var graphicTitle;
 
@@ -660,9 +681,7 @@ function initMap(layers) {
 			else if (
 				geomType == "esriGeometryPoint" &&
 				$.inArray(graphicTitle.toLowerCase(), arrExemptions) == -1
-			) {  //rather pointless while you can rename your columns in FIELDNAME_SOMETHING variables
-				 //these are used only in vanilla setting from sample files
-					if($.inArray("Name", FIELDNAME_TITLE) == -1 && graphicAtts.NAME || graphicAtts.Name || graphicAtts.name)
+			) { 	if($.inArray("Name", FIELDNAME_TITLE) == -1 && graphicAtts.NAME || graphicAtts.Name || graphicAtts.name)
 						FIELDNAME_TITLE.push("Name");
 					if($.inArray("PIC_URL", FIELDNAME_IMAGEURL) == -1 && graphicAtts.PIC_URL || graphicAtts.Pic_URL || graphicAtts.Pic_Url || graphicAtts.pic_url)
 						FIELDNAME_IMAGEURL.push("PIC_URL");
@@ -675,13 +694,47 @@ function initMap(layers) {
 					if($.inArray("Caption", FIELDNAME_DESC1) == -1 && graphicAtts.CAPTION || graphicAtts.Caption || graphicAtts.caption)
 						FIELDNAME_DESC1.push("Caption");
 					pointLayers.push(value);
-			} 
+			} else {
+				if($.inArray("Name", FIELDNAME_TITLE) == -1 && graphicAtts.NAME || graphicAtts.Name || graphicAtts.name)
+					FIELDNAME_TITLE.push("Name");
+				if($.inArray("PIC_URL", FIELDNAME_IMAGEURL) == -1 && graphicAtts.PIC_URL || graphicAtts.Pic_URL ||graphicAtts.Pic_Url || graphicAtts.pic_url)
+					FIELDNAME_IMAGEURL.push("PIC_URL");
+				if($.inArray("THUMB_URL", FIELDNAME_IMAGEURL) == -1 && graphicAtts.THUMB_URL || graphicAtts.Thumb_URL || graphicAtts.Thumb_Url || graphicAtts.thumb_url)
+					FIELDNAME_IMAGEURL.push("THUMB_URL");
+				if($.inArray("PICTURE", FIELDNAME_IMAGEURL) == -1 && graphicAtts.PICTURE || graphicAtts.Picture || graphicAtts.picture)
+					FIELDNAME_IMAGEURL.push("PICTURE");
+				if($.inArray("DESCRIPTION", FIELDNAME_DESC1) == -1 && graphicAtts.DESCRIPTION || graphicAtts.Description || graphicAtts.description)
+					FIELDNAME_DESC1.push("Description");
+				if($.inArray("Caption", FIELDNAME_DESC1) == -1 && graphicAtts.CAPTION || graphicAtts.Caption || graphicAtts.caption)
+					FIELDNAME_DESC1.push("Caption");
+				supportLayers.push(value);
+				temporarySupportLayers.push(value);
+			}
 		}
 		else {
 			// if the layer has an url property (meaning that it comes from a service), just
 			// keep going...it will remain in the map, but won't be query-able.
 		}
 	});
+var supportLayer;
+	$.each(supportLayers,function(index,value) {
+		supportLayer = _map.getLayer($.grep(_map.graphicsLayerIds, function(n,i){return _map.getLayer(n).id == getID(value);})[0]);
+		if (supportLayer == null) return;
+		$.each(supportLayer.graphics,function(index,value) {
+			// assign extra method to handle case sensitivity
+			value.attributes.getValueCI = getValueCI;
+		});
+
+		var supportLayerName = supportLayer.name;
+		
+		if ($.inArray(supportLayer.name.toLowerCase(), supportingLayersThatAreClickable) > -1) {
+			_SupportLayerSignalMouseOver[_iterator]=on(supportLayer, "mouse-over", baselayer_onMouseOver);
+			_SupportLayerSignalMouseOut[_iterator]=on(supportLayer, "mouse-out", baselayer_onMouseOut);
+			_SupportLayerSignalClick[_iterator]=on(supportLayer, "click", baselayer_onClick);
+			_iterator = _iterator +1;
+		} 
+	});
+
 
 
 	var contentLayer;
@@ -738,7 +791,6 @@ function initMap(layers) {
 		$.each(features, function(index,value) {
 			value.attributes.getValueCI = getValueCI; });
 		features=features.mergeSort(SortBySomething);
-		
 		$.each(features, function(index,value) {
 			value.attributes[FIELDNAME_ID] = index + 1; // assign internal shortlist id which is then used if fieldname NUMBER is not present
 			if(index === 0){
@@ -768,9 +820,9 @@ function initMap(layers) {
 		contentLayer.color = colorScheme.color;
 		contentLayer.title = title;
 		
-		on(contentLayer, "mouse-over", layer_onMouseOver);
-		on(contentLayer, "mouse-out", layer_onMouseOut);
-		on(contentLayer, "click", layer_onClick);
+		_LayerOnMouseOverSignal=on(contentLayer, "mouse-over", layer_onMouseOver);
+		_LayerOnMouseOutSignal=on(contentLayer, "mouse-out", layer_onMouseOut);
+		_LayerOnClick=on(contentLayer, "click", layer_onClick);
 		temporaryPointLayers.push(contentLayer);
 		_map.addLayer(contentLayer);
 		_contentLayers.push(contentLayer);
@@ -816,8 +868,10 @@ function tile_onClick(e) {
 
 	var id = parseInt($(this).attr("id").substring(4));
 //	preSelection();
-	_selected = $.grep(_layerCurrent.graphics,function(n,i){return n.attributes.getValueCI(FIELDNAME_ID) == id;})[0];
+	_selected = $.grep(_layerCurrent.graphics,function(n,i)
+	{return n.attributes.getValueCI(FIELDNAME_ID) == id;})[0];
 	postSelection();
+	
 	
 }
 
@@ -826,6 +880,7 @@ function layer_onClick(event)
 	//preSelection();
 	_selected = event.graphic;
 	postSelection();
+	Tooltip.hide(_node);
 }
 
 function layer_onMouseOver(event)
@@ -849,6 +904,34 @@ function layer_onMouseOut(event)
 	_map.setMapCursor("default");
 	Tooltip.hide(_node);
 }
+function baselayer_onMouseOver(event)
+{
+	if (_isMobile) return;
+	_map.setMapCursor("pointer");
+	var graphic = event.graphic;
+	if(!graphic.attributes.getValueCI)
+		graphic.attributes.getValueCI = getValueCI;
+	var _Title = "<font size=2>"+ graphic.attributes.getValueCI(FIELDNAME_TITLE)+ "</font>";
+				_node = graphic.getNode();
+				 new Tooltip ({
+					connectId:[_node],
+					label:_Title,
+					showDelay:50
+				});
+				Tooltip.show(_Title,_node);
+}
+
+function baselayer_onMouseOut(event)
+{
+	if (_isMobile) return;
+	_map.setMapCursor("default");
+	Tooltip.hide(_node);
+}
+
+function baselayer_onClick(event) {
+	buildPopup(event.graphic, event.mapPoint, "true");
+	Tooltip.hide(_node);
+}
 
 
 function getFeatureSet(layer)
@@ -856,12 +939,6 @@ function getFeatureSet(layer)
 	return layer.url ? layer.featureCollection.featureSet : layer.featureCollection.layers[0].featureSet;
 }
 
-
-function unselect() {
-//	preSelection();
-	_selected = null;
-	postSelection();
-}
 
 	
 
@@ -1044,11 +1121,29 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
       _map.infoWindow.hide();	//hides infowindow if one is open
       							
       _ExtentChangeSignal.remove();
+      _LayerOnMouseOverSignal.remove(); //mozna zbytecne!!
+	  _LayerOnMouseOutSignal.remove();
+	  _LayerOnClick.remove();
       _WidgetMoveSignal.remove();
+      _map.setInfoWindowOnClick(true);
+   		if (_SupportLayerSignalMouseOver){
+   			$(_SupportLayerSignalMouseOver).each(function(index) {
+ 		 _SupportLayerSignalMouseOver[index].remove();
+		});
+		}
+		if (_SupportLayerSignalMouseOut){
+   			$(_SupportLayerSignalMouseOut).each(function(index) {
+ 		 _SupportLayerSignalMouseOut[index].remove();
+		});
+		}
+   		if (_SupportLayerSignalClick){
+   			$(_SupportLayerSignalClick).each(function(index) {
+ 		 _SupportLayerSignalClick[index].remove();
+		});
+		}
      if (ORDERING){
       MYmenu.destroy();
       MYbutton.destroy();
-      
      }
     },
 
@@ -1061,7 +1156,6 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
     },
 
     onSignIn: function(credential){
-      /* jshint unused:false*/
       console.log('onSignIn');
     },
 

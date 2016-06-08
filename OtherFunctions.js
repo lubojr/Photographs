@@ -17,7 +17,14 @@ function SortBySomething(a,b){
       return ((aNumber < bNumber) ? 1 :-1);
     }
 }
-	
+
+function isMobile() {
+	var android = navigator.userAgent.match(/Android/i) ? true : false;
+	var blackberry = navigator.userAgent.match(/BlackBerry/i) ? true : false;
+	var ios = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? true : false;
+	var windows = navigator.userAgent.match(/IEMobile/i) ? true : false;
+	return (android || blackberry || ios || windows);
+}
 function mergeSort(compare) {
     var length = this.length,
         middle = Math.floor(length / 2);
@@ -164,8 +171,7 @@ function postSelection(skipPopup) {
                 console.log("problem with 'moveToFront()'...");
             }
         }, 10);
-        if (!skipPopup) buildPopup(_selected, _selected.geometry);
-        var tile = findTile(_selected.attributes.getValueCI(FIELDNAME_ID));
+        buildPopup(_selected, _selected.geometry);
     }
 }
 
@@ -329,3 +335,6 @@ function prependURLHTTP(url) {
     if (!/^(https?:\/\/)|^(\/\/)/i.test(url)) return 'http://' + url;
     return url;
 }
+
+
+
