@@ -58,7 +58,7 @@ FIELDNAME_TITLE = ["Title"];
 FIELDNAME_SHORTDESC = ["Short_desc"];
 FIELDNAME_IMAGEURL = ["Image_URL"];
 FIELDNAME_ADDRESS = ["Address"];
-FIELDNAME_WEBSITE = ["url_foto"];
+FIELDNAME_WEBSITE = ["Website"];
 FIELDNAME_DESC1 = ["Desc1"];
 FIELDNAME_DESC2 = ["Desc2"];
 FIELDNAME_DESC3 = ["Desc3"];
@@ -129,7 +129,7 @@ if (ORDERING){
  MYmenu = new Menu({ style: "display: none;"});
    if (ORDER_ENTRIES_BY == FIELDNAME_TITLE){
    var menuItem1 = new RadioMenuItem({
-        label: "name",
+        label: this.nls.orderTitle,
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -140,7 +140,7 @@ if (ORDERING){
    }
    else {
    var menuItem1 = new RadioMenuItem({
-        label: "name",
+        label: this.nls.orderTitle,
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -154,7 +154,7 @@ if (ORDERING){
 if (FIELDNAME_YEAR.length>0){
 	if(ORDER_ENTRIES_BY == FIELDNAME_YEAR){
 	  var menuItem2 = new RadioMenuItem({
-        label: "year",
+        label: this.nls.orderYear,
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -165,7 +165,7 @@ if (FIELDNAME_YEAR.length>0){
    }
    else {
    	var menuItem2 = new RadioMenuItem({
-        label: "year",
+        label: this.nls.orderYear,
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -180,7 +180,7 @@ if (FIELDNAME_YEAR.length>0){
    if (FIELDNAME_SOURCE.length>0){
    	if(ORDER_ENTRIES_BY == FIELDNAME_SOURCE){
    var  menuItem3 = new RadioMenuItem({
-        label: "source",
+        label: this.nls.orderSource,
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -191,7 +191,7 @@ if (FIELDNAME_YEAR.length>0){
    }
    else {
    	var  menuItem3 = new RadioMenuItem({
-        label: "source",
+        label: this.nls.orderSource,
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -205,7 +205,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.addChild(new MenuSeparator)
     if (ASCENDING){
     var   menuItem4 = new RadioMenuItem({
-        label: "ascending",
+        label: this.nls.orderAsc,
         checked:true,
         group:'g2',
         onChange: function(){
@@ -217,7 +217,7 @@ if (FIELDNAME_YEAR.length>0){
     else 
     {
     var   menuItem4 = new RadioMenuItem({
-        label: "ascending",
+        label: this.nls.orderAsc,
         checked:false,
         group:'g2',
         onChange: function(){
@@ -229,7 +229,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.addChild(menuItem4);
     if (!ASCENDING){
    var  menuItem5 = new RadioMenuItem({
-        label: "descending",
+        label: this.nls.orderDesc,
         checked:true,
         group:'g2',
         onChange: function(){ 
@@ -240,7 +240,7 @@ if (FIELDNAME_YEAR.length>0){
     }
     else {
     	 var  menuItem5 = new RadioMenuItem({
-        label: "descending",
+        label: this.nls.orderDesc,
         checked:false,
         group:'g2',
         onChange: function(){ 
@@ -254,7 +254,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.startup();
     
      MYbutton = new ComboButton({
-        label: "Order entries by ",
+        label: this.nls.orderMenu,
         dropDown: MYmenu
     });
     MYbutton.placeAt("Ordering");
