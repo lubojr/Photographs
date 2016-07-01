@@ -38,7 +38,6 @@ function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,
     postCreate: function() {
       this.inherited(arguments);
       console.log('postCreate');
-  
     },
 
     startup: function() {
@@ -127,7 +126,7 @@ _pointsInOneLayer = null;
 _map = this.map;
 _isMobile = isMobile();
 _panel=[];
-_iterator = [0];
+_iterator = 0;
 _SupportLayerSignalMouseOver=[];
 _SupportLayerSignalMouseOut=[];
 _SupportLayerSignalClick=[];
@@ -336,9 +335,7 @@ function getValueCI(fields) {
 }
 function onWindowResize()
 {
-        console.log("vubec se posouva")
         if(MapManager.getInstance().isMobileInfoWindow){
-        	console.log("je platna ifka"); 
           _map.setInfoWindow(MapManager.getInstance()._mapInfoWindow);
           this.popup = _map.infoWindow;
           MapManager.getInstance().isMobileInfoWindow = false;
