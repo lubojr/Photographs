@@ -54,26 +54,18 @@ function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,
     /////////////////////////////////////////
  
 FIELDNAME_NUMBER = ["Number2"];//if Used, the ordering when widget starts is done according to Number
-//FIELDNAME_TITLE = ["nazev"];
 FIELDNAME_TITLE = ["Title"];
-//FIELDNAME_SHORTDESC = ["popis"];
 FIELDNAME_SHORTDESC = ["Short_desc"];
-//FIELDNAME_IMAGEURL = ["url_foto"];
 FIELDNAME_IMAGEURL = ["Image_URL"];
 FIELDNAME_ADDRESS = ["Address"];
 FIELDNAME_WEBSITE = ["url_foto"];
-//FIELDNAME_DESC1 = ["popis"];
 FIELDNAME_DESC1 = ["Desc1"];
-//FIELDNAME_DESC2 = ["datace"];
 FIELDNAME_DESC2 = ["Desc2"];
-//FIELDNAME_DESC3 = ["zdroj"];
 FIELDNAME_DESC3 = ["Desc3"];
 FIELDNAME_DESC4 = ["Desc4"];
 FIELDNAME_DESC5 = ["Desc5"];
-//FIELDNAME_YEAR =["datace"]; 	//IS USED FOR ORDERING BY YEAR, NOT SHOWN IN PANELS - SHOULD BE A NUMBER ONLY
-FIELDNAME_YEAR =["Desc1"]; 
-//FIELDNAME_SOURCE =["zdroj"]; 	//IS USED FOR ORDERING BY SOURCE, NOT SHOWN IN PANELS
-FIELDNAME_SOURCE =["Desc2"]; 	
+FIELDNAME_YEAR =["Desc1"];	//IS USED FOR ORDERING BY YEAR, NOT SHOWN IN PANELS - SHOULD BE A NUMBER ONLY
+FIELDNAME_SOURCE =["Desc2"];	//IS USED FOR ORDERING BY SOURCE, NOT SHOWN IN PANELS
 FIELDNAME_TAB = ["Tab_Name"];
 FIELDNAME_ID = ["Shortlist_ID"];  
 DETAILS_PANEL = true;  
@@ -137,7 +129,7 @@ if (ORDERING){
  MYmenu = new Menu({ style: "display: none;"});
    if (ORDER_ENTRIES_BY == FIELDNAME_TITLE){
    var menuItem1 = new RadioMenuItem({
-        label: "název",
+        label: "name",
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -148,7 +140,7 @@ if (ORDERING){
    }
    else {
    var menuItem1 = new RadioMenuItem({
-        label: "název",
+        label: "name",
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -162,7 +154,7 @@ if (ORDERING){
 if (FIELDNAME_YEAR.length>0){
 	if(ORDER_ENTRIES_BY == FIELDNAME_YEAR){
 	  var menuItem2 = new RadioMenuItem({
-        label: "rok pořízení",
+        label: "year",
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -173,7 +165,7 @@ if (FIELDNAME_YEAR.length>0){
    }
    else {
    	var menuItem2 = new RadioMenuItem({
-        label: "rok pořízení",
+        label: "year",
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -188,7 +180,7 @@ if (FIELDNAME_YEAR.length>0){
    if (FIELDNAME_SOURCE.length>0){
    	if(ORDER_ENTRIES_BY == FIELDNAME_SOURCE){
    var  menuItem3 = new RadioMenuItem({
-        label: "zdroj fotografie",
+        label: "source",
         checked:true,
         group:'g1',
         onChange: function(){ 
@@ -199,7 +191,7 @@ if (FIELDNAME_YEAR.length>0){
    }
    else {
    	var  menuItem3 = new RadioMenuItem({
-        label: "zdroj fotografie",
+        label: "source",
         checked:false,
         group:'g1',
         onChange: function(){ 
@@ -213,7 +205,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.addChild(new MenuSeparator)
     if (ASCENDING){
     var   menuItem4 = new RadioMenuItem({
-        label: "vzestupně",
+        label: "ascending",
         checked:true,
         group:'g2',
         onChange: function(){
@@ -225,7 +217,7 @@ if (FIELDNAME_YEAR.length>0){
     else 
     {
     var   menuItem4 = new RadioMenuItem({
-        label: "vzestupně",
+        label: "ascending",
         checked:false,
         group:'g2',
         onChange: function(){
@@ -237,7 +229,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.addChild(menuItem4);
     if (!ASCENDING){
    var  menuItem5 = new RadioMenuItem({
-        label: "sestupně",
+        label: "descending",
         checked:true,
         group:'g2',
         onChange: function(){ 
@@ -248,7 +240,7 @@ if (FIELDNAME_YEAR.length>0){
     }
     else {
     	 var  menuItem5 = new RadioMenuItem({
-        label: "sestupně",
+        label: "descending",
         checked:false,
         group:'g2',
         onChange: function(){ 
@@ -262,7 +254,7 @@ if (FIELDNAME_YEAR.length>0){
     MYmenu.startup();
     
      MYbutton = new ComboButton({
-        label: "Řazení záznamů podle",
+        label: "Order entries by ",
         dropDown: MYmenu
     });
     MYbutton.placeAt("Ordering");
