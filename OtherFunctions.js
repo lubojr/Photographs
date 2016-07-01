@@ -196,7 +196,7 @@ function buildPopup(feature, geometry, baseLayerClick) {
     var shortDesc = atts.getValueCI(FIELDNAME_SHORTDESC);
     var picture = atts.getValueCI(FIELDNAME_IMAGEURL);
     var website = prependURLHTTP(atts.getValueCI(FIELDNAME_WEBSITE));
-    var contentDiv = $("<div></div>");
+     contentDiv = $("<div></div>");
     if (shortDesc) {
         $(contentDiv).append($(
             "<div class='description' tabindex='0'></div>").html(

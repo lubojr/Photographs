@@ -21,7 +21,8 @@ define(['dojo/_base/declare',
  'dijit/RadioMenuItem',
  'dijit/MenuSeparator',
  'dijit/form/ComboButton',
- 'dojo/dom', 
+ 'dojo/dom',
+ 'jimu/MapManager', 
  'dijit/Tooltip',
  './colorbox',
  './OtherFunctions',
@@ -29,7 +30,7 @@ define(['dojo/_base/declare',
  ],
 function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,on, 
 	DeferredList,PictureMarkerSymbol,Graphic, topic, lang, 
-	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, Tooltip) {
+	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, MapManager, Tooltip) {
   return declare([BaseWidget], {
 	name: 'Photographs',
     baseClass: 'jimu-widget-Photographs',
@@ -46,7 +47,6 @@ function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,
       console.log('startup');
 
     },
-
     onOpen: function(){
       console.log('onOpen');
       
@@ -54,7 +54,7 @@ function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,
 /////////////////CAN BE EDITED START///////////////
     /////////////////////////////////////////
  
-FIELDNAME_NUMBER = ["Number2"];//když nechám number, tak se zezačátku čísla řadí podle number a ne podle jména, woe
+FIELDNAME_NUMBER = ["Number2"];//if Used, the ordering when widget starts is done according to Number
 //FIELDNAME_TITLE = ["nazev"];
 FIELDNAME_TITLE = ["Title"];
 //FIELDNAME_SHORTDESC = ["popis"];
@@ -334,6 +334,16 @@ function getValueCI(fields) {
 	if ($.trim(value).length == 0) value = null;
 	return value;
 }
+function onWindowResize()
+{
+        console.log("vubec se posouva")
+        if(MapManager.getInstance().isMobileInfoWindow){
+        	console.log("je platna ifka"); 
+          _map.setInfoWindow(MapManager.getInstance()._mapInfoWindow);
+          this.popup = _map.infoWindow;
+          MapManager.getInstance().isMobileInfoWindow = false;
+        }
+      }
 function buildLayers(layer, featServLayerIndex){
 			var atts = layer.graphics[0].attributes;
 			atts.getValueCI = getValueCI;
@@ -855,7 +865,9 @@ var supportLayer;
 	_WidgetMoveSignal = topic.subscribe('/dnd/move/stop', lang.hitch(this, function(){  
   		refreshList(); 
 		})); 
-	
+	_WindowResizeSignal=on(window, 'resize', function(){ onWindowResize()
+		});
+	onWindowResize();
 }
 
 /////////////////////////////////event handlers
@@ -1128,6 +1140,7 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
       _map.setInfoWindowOnClick(true);
    		if (_SupportLayerSignalMouseOver){
    			$(_SupportLayerSignalMouseOver).each(function(index) {
+   				console.log(index)
  		 _SupportLayerSignalMouseOver[index].remove();
 		});
 		}
