@@ -129,8 +129,13 @@ function _ActivateLayer(layer) {
         tile = $('<li tabindex="0" id="item' + value.attributes.getValueCI(
                 FIELDNAME_ID) + '" style="display:' + display +
             '">');
-        img = $('<img src="' + value.attributes.getValueCI(
-            FIELDNAME_IMAGEURL) + '"alt>');
+		var imgSource = value.attributes.getValueCI(FIELDNAME_IMAGEURL)
+		if(imgSource.indexOf("http") !== -1){
+			img = $('<img src="'+imgSource+'"alt>');
+		}
+		else {
+			img = $('<img src="http://'+imgSource+'"alt>');
+		}
         footer = $('<div class="footer"></div>');
         num = $('<div class="num" style="background-color:' +
             _layerCurrent.color + '">' + value.attributes.getValueCI(
@@ -195,6 +200,9 @@ function buildPopup(feature, geometry, baseLayerClick) {
     var title = atts.getValueCI(FIELDNAME_TITLE);
     var shortDesc = atts.getValueCI(FIELDNAME_SHORTDESC);
     var picture = atts.getValueCI(FIELDNAME_IMAGEURL);
+	if(picture.indexOf("http") == -1){
+		picture = "http://"+picture;
+	}
     var website = prependURLHTTP(atts.getValueCI(FIELDNAME_WEBSITE));
      contentDiv = $("<div></div>");
     if (shortDesc) {
@@ -264,8 +272,11 @@ function showDetails(graphic, e) {
         FIELDNAME_TITLE) + '</div>');
     var leftDiv = $('<div class="leftDiv"></div>');
     var rightDiv = $('<div class="rightDiv"></div>');
-    var imageDiv = $('<img alt="" tabindex="-1" src="' + graphic.attributes
-        .getValueCI(FIELDNAME_IMAGEURL) + '">');
+	var imageDetail=graphic.attributes.getValueCI(FIELDNAME_IMAGEURL);
+	if(imageDetail.indexOf("http") == -1){
+		imageDetail = "http://"+imageDetail;
+	}
+    var imageDiv = $('<img alt="" tabindex="-1" src="' + imageDetail + '">');
     var pictureFrame = $('<div class="pictureFrame" tabindex="-1"></div>');
     $(pictureFrame).append(imageDiv);
     $(leftDiv).append(pictureFrame);

@@ -97,7 +97,7 @@ SUPPORTING_LAYERS_THAT_ARE_CLICKABLE = "Trails|Tramway|Neighborhoods|Convention 
     /////////////////////////////////////////
 /////////////////CAN BE EDITED END///////////////
     /////////////////////////////////////////
-    
+     
   COLOR_SCHEMES = [
 	{name:"blue",iconDir:"blue",iconPrefix:"NumberIconb",color:"#177ff1"},
 	{name:"red",iconDir:"red",iconPrefix:"NumberIconr",color:"#fd2d29"},
@@ -1005,7 +1005,11 @@ function _ActivateLayer(layer) {
 				display = "none";
 			}
 		tile = $('<li tabindex="0" id="item'+value.attributes.getValueCI(FIELDNAME_ID)+'" style="display:'+display+'">');
-		img = $('<img src="'+value.attributes.getValueCI(FIELDNAME_IMAGEURL)+'"alt>');
+		var imgSource = value.attributes.getValueCI(FIELDNAME_IMAGEURL)
+		if(imgSource.indexOf("http") == -1){
+			imgSource = "http://"+imgSource;
+		}
+		img = $('<img src="'+imgSource+'"alt>');
 		footer = $('<div class="footer"></div>');
 		num = $('<div class="num" style="background-color:'+_layerCurrent.color+'">'+value.attributes.getValueCI(FIELDNAME_NUMBER)+'</div>');
 		title = $('<div class="blurb">'+value.attributes.getValueCI(FIELDNAME_TITLE)+'</div>');
@@ -1122,14 +1126,13 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
       _map.infoWindow.hide();	//hides infowindow if one is open
       							
       _ExtentChangeSignal.remove();
-      _LayerOnMouseOverSignal.remove(); //mozna zbytecne!!
+      _LayerOnMouseOverSignal.remove(); 
 	  _LayerOnMouseOutSignal.remove();
 	  _LayerOnClick.remove();
       _WidgetMoveSignal.remove();
       _map.setInfoWindowOnClick(true);
    		if (_SupportLayerSignalMouseOver){
    			$(_SupportLayerSignalMouseOver).each(function(index) {
-   				console.log(index)
  		 _SupportLayerSignalMouseOver[index].remove();
 		});
 		}
