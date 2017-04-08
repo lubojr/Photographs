@@ -24,13 +24,14 @@ define(['dojo/_base/declare',
  'dojo/dom',
  'jimu/MapManager', 
  'dijit/Tooltip',
+ 'esri/tasks/FeatureSet',
  './colorbox',
  './OtherFunctions',
  './idangerousswiper',
  ],
 function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,on, 
 	DeferredList,PictureMarkerSymbol,Graphic, topic, lang, 
-	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, MapManager, Tooltip) {
+	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, MapManager, Tooltip,FeatureSet) {
   return declare([BaseWidget], {
 	name: 'Photographs',
     baseClass: 'jimu-widget-Photographs',
@@ -98,6 +99,7 @@ SUPPORTING_LAYERS_THAT_ARE_CLICKABLE = "Trails|Tramway|Neighborhoods|Convention 
 /////////////////CAN BE EDITED END///////////////
     /////////////////////////////////////////
      
+    
   COLOR_SCHEMES = [
 	{name:"blue",iconDir:"blue",iconPrefix:"NumberIconb",color:"#177ff1"},
 	{name:"red",iconDir:"red",iconPrefix:"NumberIconr",color:"#fd2d29"},
@@ -361,7 +363,7 @@ function buildLayers(layer, featServLayerIndex){
 				});
 				if(!_newLayersAdded){
 					$.each(_newThemes, function(index, theme){
-						var featServiceFeatureSet = new tasks.FeatureSet();
+						var featServiceFeatureSet = new FeatureSet();
 						featServiceFeatureSet.features = theme.features;
 						//create a feature collection
 				        var featureCollection = {
@@ -428,10 +430,9 @@ function buildLayers(layer, featServLayerIndex){
 
 		var featServRequests = 0;
 		if(_featureService){
-
 			var fields = [];
 			var features = [];
-			var featServiceFeatureSet = new tasks.FeatureSet();
+			var featServiceFeatureSet = new FeatureSet();
 			var oldLayers = [];
 			var requestIndex = -1;
 			var requests = [];
@@ -625,8 +626,8 @@ function initMap(layers) {
 	var graphicTitle;
 
 	$.each(layers, function(index,value){
-		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url) //pokud feature layer není viditelná v současném měřítku, nezobrazovat
-			return;
+		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url)
+		return;
 		if(value.id === 'labels'){
 			setTimeout(function(){
 				if(value.featureLayers[0].graphics[0].attributes.getValueCI && value.featureLayers[0].graphics[0].attributes.getValueCI(FIELDNAME_TAB))
@@ -1126,13 +1127,14 @@ $.each(temporaryPointLayers,function(index,value) { 	     //removes added graphi
       _map.infoWindow.hide();	//hides infowindow if one is open
       							
       _ExtentChangeSignal.remove();
-      _LayerOnMouseOverSignal.remove(); 
+      _LayerOnMouseOverSignal.remove();
 	  _LayerOnMouseOutSignal.remove();
 	  _LayerOnClick.remove();
       _WidgetMoveSignal.remove();
       _map.setInfoWindowOnClick(true);
    		if (_SupportLayerSignalMouseOver){
    			$(_SupportLayerSignalMouseOver).each(function(index) {
+   				console.log(index)
  		 _SupportLayerSignalMouseOver[index].remove();
 		});
 		}
