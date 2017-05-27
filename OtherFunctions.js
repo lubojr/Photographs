@@ -244,9 +244,13 @@ function buildPopup(feature, geometry, baseLayerClick) {
                 website + '" target="_blank">Website</a></div>').css(
                 "padding-top", 10));
         }
+		$(contentDiv).append($("<div></div>").addClass("zoomTo").attr(
+            "tabindex", "0").html("Zoom >>"));
     } else {
         $(contentDiv).append($("<div></div>").addClass("infoWindowLink").attr(
-            "tabindex", "0").html("Details"));
+            "tabindex", "0").html("Details "));
+		$(contentDiv).append($("<div></div>").addClass("zoomTo").attr(
+            "tabindex", "0").html("Zoom >>"));
     }
     _map.infoWindow.setContent("<div>" + contentDiv.html() + "</div>");
     $('.infoWindowLink').last().append($(
@@ -257,12 +261,14 @@ function buildPopup(feature, geometry, baseLayerClick) {
     $(".infoWindowLink").click(function(e) {
         showDetails(feature, e);
     });
+	
     if (DETAILS_PANEL) {
         $(".infoWindowPictureDiv").click(function(e) {
             showDetails(feature, e);
         });
     }
 }
+
 
 function showDetails(graphic, e) {
     if (!graphic.attributes.getValueCI) graphic.attributes.getValueCI =

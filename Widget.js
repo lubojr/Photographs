@@ -10,7 +10,6 @@ define(['dojo/_base/declare',
  // WARNING!! Mandatory to put this line: 'code.jquery.com/jquery-1.11.2.min.js' into resource array in init.js in stemapp folder and then upload it to server!!
  // jquery module colorbox needs JQuery already loaded while loading itself (colorbox is used when DETAILS_PANEL is set to true)
  // loading both here in define does not ensure loading order, so this workaround is the only thing that I found
- 
  'dojo/on',									
  'dojo/DeferredList',						
  'esri/symbols/PictureMarkerSymbol',
@@ -25,13 +24,14 @@ define(['dojo/_base/declare',
  'jimu/MapManager', 
  'dijit/Tooltip',
  'esri/tasks/FeatureSet',
+  'esri/geometry/Extent',
+ 'esri/SpatialReference',
  './colorbox',
  './OtherFunctions',
- './idangerousswiper',
  ],
 function(declare, BaseWidget, Point, graphics, FeatureLayer, GraphicsLayer, map,on, 
 	DeferredList,PictureMarkerSymbol,Graphic, topic, lang, 
-	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, MapManager, Tooltip,FeatureSet) {
+	Menu, RadioMenuItem, MenuSeparator, ComboButton, dom, MapManager, Tooltip,FeatureSet, Extent, SpatialReference) {
   return declare([BaseWidget], {
 	name: 'Photographs',
     baseClass: 'jimu-widget-Photographs',
@@ -265,7 +265,6 @@ if (FIELDNAME_YEAR.length>0){
     
   
 //////////////////ordering //////////////////
-
 
 //checks in which theme it is (box and dart have other names for their panels than jimu-panel)
 	if ($(".jimu-panel").length > 0) {
@@ -626,7 +625,7 @@ function initMap(layers) {
 	var graphicTitle;
 
 	$.each(layers, function(index,value){
-		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url)
+		if(!value.visibleAtMapScale && value.type == "Feature Layer" && value.url) 
 		return;
 		if(value.id === 'labels'){
 			setTimeout(function(){
@@ -872,6 +871,10 @@ function tile_onClick(e) {
 //	preSelection();
 	_selected = $.grep(_layerCurrent.graphics,function(n,i)
 	{return n.attributes.getValueCI(FIELDNAME_ID) == id;})[0];
+	$(".zoomTo").click(function(event2) {
+    _map.setExtent(new Extent(_selected.geometry.x-150,_selected.geometry.y-150,_selected.geometry.x+150,_selected.geometry.y+150
+	, new SpatialReference(event.mapPoint.spatialReference)), true);
+    });
 	postSelection();
 	
 	
@@ -880,10 +883,18 @@ function tile_onClick(e) {
 function layer_onClick(event)
 {
 	//preSelection();
+
 	_selected = event.graphic;
 	postSelection();
+	$(".zoomTo").click(function(event2) {
+    _map.setExtent(new Extent(_selected.geometry.x-150,_selected.geometry.y-150,_selected.geometry.x+150,_selected.geometry.y+150
+	, new SpatialReference(event.mapPoint.spatialReference)), true);
+    });
 	Tooltip.hide(_node);
 }
+
+
+
 
 function layer_onMouseOver(event)
 {
@@ -932,6 +943,10 @@ function baselayer_onMouseOut(event)
 
 function baselayer_onClick(event) {
 	buildPopup(event.graphic, event.mapPoint, "true");
+	$(".zoomTo").click(function(event2) {
+    _map.setExtent(new Extent(event.mapPoint.x-150,event.mapPoint.y-150,event.mapPoint.x+150,event.mapPoint.y+150
+	, new SpatialReference(event.mapPoint.spatialReference)), true);
+    });
 	Tooltip.hide(_node);
 }
 

@@ -1,8 +1,10 @@
-.jimu-widget-Photographs #divStrip {
+.jimu-widget-Photographs #paneLeft {
     width: 100%;
-    height: 35px;
-    background-color: #7a7a7a;
-    overflow: visible;
+    min-width:320px;
+    height: 100%;
+    overflow: auto;
+    background-color: #b9b9b9;
+    padding: 4px;
 }
 .jimu-widget-Photographs #Ordering
 {
@@ -14,16 +16,14 @@
     font-weight: 600;
 }
 
-.jimu-widget-Photographs #paneLeft {
-    width: 325px;
-    height: 100%;
-    overflow: auto;
+.jimu-widget-Photographs #divStrip {
+    width: 100%;
+    height: 35px;
     background-color: #b9b9b9;
-    padding: 4px;
+    overflow: visible;
 }
-
 .jimu-widget-Photographs ul.tilelist {
-    width: 320px;
+    width: 100%;
     padding-left: 1px;
     display: inline-block;
     overflow: auto;
@@ -83,7 +83,7 @@
 }
 
 .jimu-widget-Photographs #tabs {
-    height: 35px;
+    height: 100%;
     padding-left: 8px;
     overflow: visible;
 }
@@ -110,7 +110,7 @@
 }
 
 .jimu-widget-Photographs .tab-selected {
-    background-color: #b9b9b9;
+    background-color: #7a7a7a;
     color: #FFF;
     cursor: default;
 }
@@ -194,12 +194,26 @@
 }
 
 .infoWindowLink {
+	width:80px;
     color: #369;
     cursor: pointer;
     font-weight: 700;
 }
 
 .infoWindowLink:hover {
+    text-decoration: underline;
+}
+
+.zoomTo {
+    color: #369;
+	width:80px;
+    cursor: pointer;
+    font-weight: 700;
+	float:right;
+	
+}
+
+.zoomTo:hover {
     text-decoration: underline;
 }
 
