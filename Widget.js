@@ -24,7 +24,7 @@ define(['dojo/_base/declare',
  'jimu/MapManager', 
  'dijit/Tooltip',
  'esri/tasks/FeatureSet',
-  'esri/geometry/Extent',
+ 'esri/geometry/Extent',
  'esri/SpatialReference',
  './colorbox',
  './OtherFunctions',
@@ -871,12 +871,11 @@ function tile_onClick(e) {
 //	preSelection();
 	_selected = $.grep(_layerCurrent.graphics,function(n,i)
 	{return n.attributes.getValueCI(FIELDNAME_ID) == id;})[0];
+	postSelection();
 	$(".zoomTo").click(function(event2) {
     _map.setExtent(new Extent(_selected.geometry.x-150,_selected.geometry.y-150,_selected.geometry.x+150,_selected.geometry.y+150
-	, new SpatialReference(event.mapPoint.spatialReference)), true);
+	, new SpatialReference(_selected.geometry.spatialReference)), true);
     });
-	postSelection();
-	
 	
 }
 
