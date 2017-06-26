@@ -195,7 +195,12 @@ function tile_onClick(e) {
 }
 
 function buildPopup(feature, geometry, baseLayerClick) {
-    var atts = feature.attributes;
+    $('.prev').addClass('hidden');
+	$('.next').addClass('hidden');
+	$('.actionList').addClass('hidden');
+	$('#map_graphics_layer').css('visibility','hidden');
+
+	var atts = feature.attributes;
     if (!atts.getValueCI) atts.getValueCI = getValueCI;
     var title = atts.getValueCI(FIELDNAME_TITLE);
     var shortDesc = atts.getValueCI(FIELDNAME_SHORTDESC);
